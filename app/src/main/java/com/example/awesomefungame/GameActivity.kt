@@ -10,6 +10,6 @@ class GameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_game)
 
         val tvMessage : TextView = findViewById(R.id.tv_message)
-        tvMessage.text = "Get ready, ${intent.getStringExtra("name")}. An awesome game is about to start..."
+        tvMessage.text = "Player: ${intent.getStringExtra("name")}. Lobby: ${intent.getStringExtra("lobby")}."
     }
 }
