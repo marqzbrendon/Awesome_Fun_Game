@@ -1,12 +1,10 @@
 package com.example.mybudgetapp
 
 data class LobbyData(
-    var lobby: Long = 0L,
-    val players: MutableList<String> = mutableListOf(),
-    val score: MutableList<String> = mutableListOf(),
+    val players: MutableList<Players> = mutableListOf(),
 )
 
-data class LobbyDataSample(
+data class Players(
     val player: String,
-    val score: Double
+    val score: Double,
 )

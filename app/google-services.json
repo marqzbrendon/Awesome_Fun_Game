@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "873772015059",
+    "project_id": "mathgame-c7ff0",
+    "storage_bucket": "mathgame-c7ff0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873772015059:android:83492285aa223f382d6326",
+        "android_client_info": {
+          "package_name": "com.example.awesomefungame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "873772015059-otehs4umnlebm3oj8j6as6g6o1h7ovhi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5BVzKASQVs4oneaLLN60Z7xu8bzmiOig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "873772015059-otehs4umnlebm3oj8j6as6g6o1h7ovhi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
