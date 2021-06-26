@@ -1,5 +1,6 @@
 package com.example.awesomefungame
 import android.widget.ArrayAdapter
+import android.widget.ListView
 import com.example.mybudgetapp.LobbyData
 import com.example.mybudgetapp.Players
 import com.google.firebase.firestore.EventListener
@@ -14,6 +15,7 @@ open class AppDatabase(private val gameActivity: GameActivity) {
         lobby: String?,
         lobbyData: LobbyData,
         adapter: ArrayAdapter<Any>,
+        lvPlayers: ListView,
     ) {
 
         db?.collection("$lobby")?.addSnapshotListener(
@@ -37,7 +39,8 @@ open class AppDatabase(private val gameActivity: GameActivity) {
                             }
                             gameActivity.setUpScoreData(
                                 lobbyData,
-                                adapter)
+                                adapter,
+                                lvPlayers)
                         }
                     }
                 })

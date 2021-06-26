@@ -2,9 +2,7 @@ package com.example.awesomefungame
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mybudgetapp.LobbyData
 import com.example.mybudgetapp.Players
@@ -20,10 +18,10 @@ class GameActivity : AppCompatActivity() {
         // Initiate player instance
         val playerName = intent.getStringExtra("name")
         val lobby = intent.getStringExtra("lobby")
-        val player = playerName?.let { Players(it,0.0) }
+        val player = playerName?.let { Players(it, 0.0) }
 
         // This creates a random sequence that will be used as ID for the doc in the database
-        val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         val playerKey = (1..10)
             .map { _ -> kotlin.random.Random.nextInt(0, charPool.size) }
             .map(charPool::get)
@@ -39,18 +37,19 @@ class GameActivity : AppCompatActivity() {
         // Add new player to Lobby database
         database.addPlayerInLobby(db, player, lobby, playerKey)
 
-        // Display ListView of players in the lobby
+        // Getting all the lobby data from the database
         val adapter: ArrayAdapter<Any> = ArrayAdapter(
             this,
-            android.R.layout.simple_dropdown_item_1line, arrayListOf("Retrieving data...") as List<Any>
+            android.R.layout.simple_dropdown_item_1line,
+            arrayListOf("Retrieving data...") as List<Any>
         )
         adapter.notifyDataSetChanged()
-
-        // Getting all the lobby data from the database
-        database.retrieveAllDocuments(db, lobby, lobbyPlayers, adapter)
+        val lvPlayers: ListView = findViewById(R.id.lv_players)
+        lvPlayers.adapter = adapter
+        database.retrieveAllDocuments(db, lobby, lobbyPlayers, adapter, lvPlayers)
 
         // Display test
-        val tvMessage : TextView = findViewById(R.id.tv_message)
+        val tvMessage: TextView = findViewById(R.id.tv_message)
         tvMessage.text = "Player: $playerName. Lobby: $lobby."
 
         // Remove player
@@ -62,7 +61,12 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    fun setUpScoreData(lobbyData: LobbyData, adapter: ArrayAdapter<Any>) {
-
+    fun setUpScoreData(lobbyData: LobbyData, adapter: ArrayAdapter<Any>, lvPlayers: ListView) {
+        adapter.clear()
+        lobbyData.players.map { x ->
+            adapter.add("${x.player} - ${x.score}")
+            adapter.notifyDataSetChanged()
+        }
+        lvPlayers.adapter = adapter
     }
 }
