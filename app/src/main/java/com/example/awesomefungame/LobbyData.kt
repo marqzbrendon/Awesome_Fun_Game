@@ -1,10 +1,10 @@
 package com.example.mybudgetapp
 
-data class LobbyData(
-    val players: MutableList<Players> = mutableListOf(),
+data class LobbyPlayers(
+    val players: MutableList<PeoplePlaying> = mutableListOf(),
 )
 
-data class Players(
+data class PeoplePlaying(
     val player: String,
     val score: Double,
 )

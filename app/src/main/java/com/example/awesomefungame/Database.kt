@@ -1,8 +1,8 @@
 package com.example.awesomefungame
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import com.example.mybudgetapp.LobbyData
-import com.example.mybudgetapp.Players
+import com.example.mybudgetapp.LobbyPlayers
+import com.example.mybudgetapp.PeoplePlaying
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -13,7 +13,7 @@ open class AppDatabase(private val gameActivity: GameActivity) {
     fun retrieveAllDocuments(
         db: FirebaseFirestore?,
         lobby: String?,
-        lobbyData: LobbyData,
+        lobbyData: LobbyPlayers,
         adapter: ArrayAdapter<Any>,
         lvPlayers: ListView,
     ) {
@@ -34,7 +34,7 @@ open class AppDatabase(private val gameActivity: GameActivity) {
                             for (doc in snapshots) {
                                 doc.getString("player")?.let {
                                     doc.getDouble("score")?.let {
-                                            it1 -> Players(it, it1) }
+                                            it1 -> PeoplePlaying(it, it1) }
                                 }?.let { lobbyData.players.add(it) }
                             }
                             gameActivity.setUpScoreData(
@@ -46,14 +46,12 @@ open class AppDatabase(private val gameActivity: GameActivity) {
                 })
     }
 
-    fun addPlayerInLobby(db: FirebaseFirestore, player: Players?, lobby: String?, playerKey: String) {
+    fun addPlayerInLobby(db: FirebaseFirestore, player: Player, lobby: String?, playerKey: String) {
         val newPlayer = HashMap<String, Any>()
-        if (player != null) {
-            newPlayer["player"] = player.player
-            newPlayer["score"] = player.score
-        }
+        newPlayer["player"] = player.name
+        newPlayer["score"] = player.score
         db.collection("$lobby")
-            .document("$playerKey")
+            .document(playerKey)
             .set(newPlayer)
     }
 

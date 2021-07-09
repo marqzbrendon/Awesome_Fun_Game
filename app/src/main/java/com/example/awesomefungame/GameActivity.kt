@@ -2,10 +2,10 @@ package com.example.awesomefungame
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mybudgetapp.LobbyData
-import com.example.mybudgetapp.Players
+import com.example.mybudgetapp.LobbyPlayers
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -28,12 +28,14 @@ class GameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_game)
 
         // Initiate player instance
-        val playerName = intent.getStringExtra("name")
+        val playerName = intent.getStringExtra("name")!!
+        val player = Player()
+        player.name = playerName
+
         lobby = intent.getStringExtra("lobby").toString()
-        val player = playerName?.let { Players(it, 0.0) }
 
         // Lobby data
-        val lobbyPlayers = LobbyData()
+        val lobbyPlayers = LobbyPlayers()
 
         // Initiate database instance
         database = AppDatabase(this)
@@ -53,8 +55,10 @@ class GameActivity : AppCompatActivity() {
         database.retrieveAllDocuments(db, lobby, lobbyPlayers, adapter, lvPlayers)
 
         // Display test
-        val tvMessage: TextView = findViewById(R.id.tv_message)
-        tvMessage.text = "Player: $playerName. Lobby: $lobby."
+        val tv_player: TextView = findViewById(R.id.tv_player)
+        tv_player.text = player.name
+        val tv_score: TextView = findViewById(R.id.tv_score)
+        tv_score.text = "Score: ${player.score}"
 
         // Remove player
         val btEnd: Button = findViewById(R.id.bt_end)
@@ -67,7 +71,7 @@ class GameActivity : AppCompatActivity() {
 
     // This function is called whenever there is a change to the database, and it updates the adapter that
     // shows the people in the lobby.
-    fun setUpScoreData(lobbyData: LobbyData, adapter: ArrayAdapter<Any>, lvPlayers: ListView) {
+    fun setUpScoreData(lobbyData: LobbyPlayers, adapter: ArrayAdapter<Any>, lvPlayers: ListView) {
         adapter.clear()
         lobbyData.players.map { x ->
             adapter.add("${x.player} - ${x.score}")
@@ -79,6 +83,7 @@ class GameActivity : AppCompatActivity() {
     // Remove player from the database if they
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("awesomeFunGame","func called onDestroy")
         database.deletePlayerInLobby(db, playerKey, lobby)
     }
 }
