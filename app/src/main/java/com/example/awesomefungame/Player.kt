@@ -1,6 +1,6 @@
 package com.example.awesomefungame
 // Player class that controls lives, score, difficulty, and related streaks
-class Player() {
+class Player {
     var name: String = ""
     var lives: Int = 3
     var correctStreak: Int = 0
@@ -9,4 +9,6 @@ class Player() {
     var score: Int = 0
     var difficultyStreak: Int = 0
     var difficulty: Int = 1
+    var playerKey: String = ""
+    var lobby: String = ""
 }

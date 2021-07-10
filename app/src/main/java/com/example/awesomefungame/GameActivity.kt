@@ -1,27 +1,33 @@
 package com.example.awesomefungame
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.widget.*
+import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mybudgetapp.LobbyPlayers
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.random.Random
+
 
 class GameActivity : AppCompatActivity() {
-    // This creates a random sequence that will be used as ID for the doc in the database
-    private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    private val playerKey = (1..15)
-        .map { kotlin.random.Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
+
+    // Private variables
     private lateinit var lobby: String
-    lateinit var correctAnswer: String
     private val db = Firebase.firestore
     private lateinit var database: AppDatabase
     private val player = Player()
-    lateinit var tvScore: TextView
+    private lateinit var tvScore: TextView
+    private lateinit var tvLives: TextView
+    private lateinit var btAnswer: Button
+
+    // Public variable
+    lateinit var correctAnswer: String
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +38,19 @@ class GameActivity : AppCompatActivity() {
         val playerName = intent.getStringExtra("name")!!
         player.name = playerName
 
+        val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        val playerKey = (1..15)
+            .map { kotlin.random.Random.nextInt(0, charPool.size) }
+            .map(charPool::get)
+            .joinToString("")
+        player.playerKey = playerKey
+
         lobby = intent.getStringExtra("lobby").toString()
+        if (lobby == "None") {
+            val random = (1..4).random()
+            lobby = random.toString()
+        }
+        player.lobby = lobby
 
         // Lobby data
         val lobbyPlayers = LobbyPlayers()
@@ -41,7 +59,7 @@ class GameActivity : AppCompatActivity() {
         database = AppDatabase(this)
 
         // Add new player to Lobby database
-        database.addPlayerInLobby(db, player, lobby, playerKey)
+        database.addPlayerInLobby(db, player)
 
         // Getting all the lobby data from the database
         val adapter: ArrayAdapter<Any> = ArrayAdapter(
@@ -52,28 +70,31 @@ class GameActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         val lvPlayers: ListView = findViewById(R.id.lv_players)
         lvPlayers.adapter = adapter
-        database.retrieveAllDocuments(db, lobby, lobbyPlayers, adapter, lvPlayers)
+        database.retrieveAllDocuments(db, player.lobby, lobbyPlayers, adapter, lvPlayers)
 
-        // Display test
+        // Display top information
         val tvPlayer: TextView = findViewById(R.id.tv_player)
         tvPlayer.text = player.name
         tvScore = findViewById(R.id.tv_score)
         tvScore.text = "Score: ${player.score}"
+        tvLives =  findViewById(R.id.tv_lives)
+        tvLives.text = "Lives: ${player.lives}"
 
         // Remove player
         val btEnd: Button = findViewById(R.id.bt_end)
         btEnd.setOnClickListener {
-            database.deletePlayerInLobby(db, playerKey, lobby)
+            database.deletePlayerInLobby(db, player)
             finish()
         }
 
         val gameFunctionalities = GameFunctionalities(this)
         gameFunctionalities.runGame(player.difficulty)
 
-        val btAnswer: Button = findViewById(R.id.bt_answer)
+        btAnswer = findViewById(R.id.bt_answer)
         btAnswer.setOnClickListener {
             getResponse(gameFunctionalities)
         }
+
 
     }
 
@@ -92,7 +113,7 @@ class GameActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("awesomeFunGame","func called onDestroy")
-        database.deletePlayerInLobby(db, playerKey, lobby)
+        database.deletePlayerInLobby(db, player)
     }
 
     fun displayValues(x: Int, y: Int, op: String) {
@@ -109,6 +130,13 @@ class GameActivity : AppCompatActivity() {
     fun getResponse(gameFunctionalities: GameFunctionalities) {
         val answer: EditText = findViewById(R.id.et_answer)
         val isCorrect: TextView = findViewById(R.id.tv_isCorrect)
+        answer.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
+            if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
+                //do what you want on the press of 'done'
+                btAnswer.performClick()
+            }
+            false
+        })
          if (gameFunctionalities.checkAnswer(answer.text.toString(), correctAnswer)) {
              isCorrect.text = "Correct Answer"
              gameFunctionalities.correctAnswer(player)
@@ -119,8 +147,20 @@ class GameActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun updateScore(score: String) {
+    fun updateScore() {
         tvScore = findViewById(R.id.tv_score)
-        tvScore.text = "Score: $score"
+        tvScore.text = "Score: ${player.score}"
+        tvLives = findViewById(R.id.tv_lives)
+        tvLives.text = "Lives: ${player.lives}"
+        database.updateScore(player, db)
+    }
+
+    fun gameOver() {
+        val intent = Intent(this, GameOverActivity::class.java)
+        intent.putExtra("playerName", player.name)
+        intent.putExtra("playerScore", player.score.toString())
+        intent.putExtra("lobby", player.lobby)
+        intent.putExtra("playerKey", player.playerKey)
+        startActivity(intent)
     }
 }

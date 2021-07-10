@@ -20,18 +20,22 @@ class GameFunctionalities(private val gameActivity: GameActivity) {
                 levelUp(player)
             }
         }
-        gameActivity.updateScore(player.score.toString())
+        gameActivity.updateScore()
         runGame(player.difficulty)
     }
 
     // Changes the lives, difficulty, and related streaks when a incorrect answer is inputted
     fun incorrectAnswer(player: Player) {
-        player.lives -= 1
-        player.correctStreak = 0
-        player.difficultyStreak = 0
-        player.streakCount = 0
-
-        runGame(player.difficulty)
+        if (player.lives == 1) {
+            gameActivity.gameOver()
+        } else {
+            player.lives -= 1
+            player.correctStreak = 0
+            player.difficultyStreak = 0
+            player.streakCount = 0
+            gameActivity.updateScore()
+            runGame(player.difficulty)
+        }
     }
 
     // Lets the player know they've moved to the next level
@@ -88,7 +92,6 @@ class GameFunctionalities(private val gameActivity: GameActivity) {
                 3, 4 -> x - y
                 else -> x * y
             }
-            Log.d("solution", "$z")
             return Triple(x, y, z)
         } else { // generates the values for level 6 (I needed to calculate x from y and s which wouldn't be defined if I hadn't defined it separately).
             val y: Int = (1..10).random()
@@ -101,7 +104,6 @@ class GameFunctionalities(private val gameActivity: GameActivity) {
 
     // checks if the answer equals the solution and returns true or false
     fun checkAnswer(a: String, b: String): Boolean {
-        Log.d("myAnswer solution", "$a")
         return a == b
     }
 }
