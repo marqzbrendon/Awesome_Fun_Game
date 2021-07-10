@@ -1,65 +1,76 @@
 package com.example.awesomefungame
-class GameFunctionalities() {
+
+import android.util.Log
+
+class GameFunctionalities(private val gameActivity: GameActivity) {
     // Changes the score, difficulty, and related streaks when a correct answer is inputted
-    fun correctAnswer(player: Player){
+    fun correctAnswer(player: Player) {
         player.score += 10
         player.score += player.correctStreak
         player.correctStreak += 5
         player.streakCount += 1
-        if (player.streakCount > player.highestStreakCount){
+        if (player.streakCount > player.highestStreakCount) {
             player.highestStreakCount = player.streakCount
         }
         player.difficultyStreak += 1
         // Increases the difficulty every three levels (when the difficulty streak is a multiple of three)
         if (player.difficultyStreak % 3 == 0) {
-            if (player.difficulty < 6){
+            if (player.difficulty < 6) {
                 player.difficulty += 1
                 levelUp(player)
             }
         }
+        gameActivity.updateScore(player.score.toString())
+        runGame(player.difficulty)
     }
+
     // Changes the lives, difficulty, and related streaks when a incorrect answer is inputted
-    fun incorrectAnswer(player: Player){
+    fun incorrectAnswer(player: Player) {
         player.lives -= 1
         player.correctStreak = 0
         player.difficultyStreak = 0
         player.streakCount = 0
+
+        runGame(player.difficulty)
     }
+
     // Lets the player know they've moved to the next level
-    fun levelUp(player: Player){
+    private fun levelUp(player: Player) {
         println("Congrats! You have reached level ${player.difficulty}")
         println()
     }
 
     // the basic game function that will run each time we cycle through our do-while loop
-    fun runGame(d: Int): Boolean {
+    fun runGame(d: Int) {
         // generates x and y values and the solution based on the difficulty
         var (x, y, s) = when (d) {
-            1    -> generateNums(1)
-            2    -> generateNums(2)
-            3    -> generateNums(3)
-            4    -> generateNums(4)
-            5    -> generateNums(5)
+            1 -> generateNums(1)
+            2 -> generateNums(2)
+            3 -> generateNums(3)
+            4 -> generateNums(4)
+            5 -> generateNums(5)
             else -> generateNums(6)
         }
         // determines the operator each difficulty uses
         val op: String = when (d) {
-            1    -> "+"
-            2    -> "+"
-            3    -> "-"
-            4    -> "-"
-            5    -> "*"
+            1 -> "+"
+            2 -> "+"
+            3 -> "-"
+            4 -> "-"
+            5 -> "*"
             else -> "/"
         }
         // if it's a subtraction level and the answer would be a negative number, switches the x and y values and recalculates the answer
-        if (x < y && op == "-"){
+        if (x < y && op == "-") {
             x = y.also { y = x }
             s = x - y
         }
-        return printProblemgetAnswer(x, y, s, op)
+        gameActivity.displayValues(x, y, op)
+        gameActivity.correctAnswer = s.toString()
     }
+
     //generates the x and y values and the solution based on the difficulty level
-    fun generateNums(d: Int): Triple<Int,Int,Int> {
+    private fun generateNums(d: Int): Triple<Int, Int, Int> {
         if (d != 6) {
             //generates the numbers for all the difficulty levels except 6
             val x: Int = when (d) {
@@ -77,30 +88,20 @@ class GameFunctionalities() {
                 3, 4 -> x - y
                 else -> x * y
             }
-            return Triple(x,y,z)
+            Log.d("solution", "$z")
+            return Triple(x, y, z)
         } else { // generates the values for level 6 (I needed to calculate x from y and s which wouldn't be defined if I hadn't defined it separately).
             val y: Int = (1..10).random()
             val z: Int = (1..20).random()
             val x: Int = y * z
-            return Triple(x,y,z)
+            Log.d("solution", "$z")
+            return Triple(x, y, z)
         }
     }
-    // prints the problem out with the passed in variables and asks the user to input their answer, calls the checkAnswer function and returns true or false to the runGame which returns to the main loop
-    fun printProblemgetAnswer(x: Int, y: Int, s: Int, op: String):Boolean {
-        print("$x $op $y = ")
-        val answer = Integer.valueOf(readLine())
-        val isCorrect: Boolean = checkAnswer(s, answer)
-        return isCorrect
-    }
+
     // checks if the answer equals the solution and returns true or false
-    fun checkAnswer(a: Int, b: Int): Boolean{
-        if (a == b) {
-            val correct: Boolean = true
-            return correct
-        }
-        else {
-            val correct: Boolean = false
-            return correct
-        }
+    fun checkAnswer(a: String, b: String): Boolean {
+        Log.d("myAnswer solution", "$a")
+        return a == b
     }
 }

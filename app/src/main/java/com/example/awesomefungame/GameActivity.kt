@@ -13,14 +13,15 @@ class GameActivity : AppCompatActivity() {
     // This creates a random sequence that will be used as ID for the doc in the database
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     private val playerKey = (1..15)
-        .map { _ -> kotlin.random.Random.nextInt(0, charPool.size) }
+        .map { kotlin.random.Random.nextInt(0, charPool.size) }
         .map(charPool::get)
-        .joinToString("");
-
+        .joinToString("")
     private lateinit var lobby: String
-
+    lateinit var correctAnswer: String
     private val db = Firebase.firestore
     private lateinit var database: AppDatabase
+    private val player = Player()
+    lateinit var tvScore: TextView
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,6 @@ class GameActivity : AppCompatActivity() {
 
         // Initiate player instance
         val playerName = intent.getStringExtra("name")!!
-        val player = Player()
         player.name = playerName
 
         lobby = intent.getStringExtra("lobby").toString()
@@ -55,16 +55,24 @@ class GameActivity : AppCompatActivity() {
         database.retrieveAllDocuments(db, lobby, lobbyPlayers, adapter, lvPlayers)
 
         // Display test
-        val tv_player: TextView = findViewById(R.id.tv_player)
-        tv_player.text = player.name
-        val tv_score: TextView = findViewById(R.id.tv_score)
-        tv_score.text = "Score: ${player.score}"
+        val tvPlayer: TextView = findViewById(R.id.tv_player)
+        tvPlayer.text = player.name
+        tvScore = findViewById(R.id.tv_score)
+        tvScore.text = "Score: ${player.score}"
 
         // Remove player
         val btEnd: Button = findViewById(R.id.bt_end)
         btEnd.setOnClickListener {
             database.deletePlayerInLobby(db, playerKey, lobby)
             finish()
+        }
+
+        val gameFunctionalities = GameFunctionalities(this)
+        gameFunctionalities.runGame(player.difficulty)
+
+        val btAnswer: Button = findViewById(R.id.bt_answer)
+        btAnswer.setOnClickListener {
+            getResponse(gameFunctionalities)
         }
 
     }
@@ -85,5 +93,34 @@ class GameActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d("awesomeFunGame","func called onDestroy")
         database.deletePlayerInLobby(db, playerKey, lobby)
+    }
+
+    fun displayValues(x: Int, y: Int, op: String) {
+        val num1: TextView = findViewById(R.id.tv_num1)
+        val num2: TextView = findViewById(R.id.tv_num2)
+        val operator: TextView = findViewById(R.id.tv_signal)
+
+        num1.text = "$x"
+        num2.text = "$y"
+        operator.text = op
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun getResponse(gameFunctionalities: GameFunctionalities) {
+        val answer: EditText = findViewById(R.id.et_answer)
+        val isCorrect: TextView = findViewById(R.id.tv_isCorrect)
+         if (gameFunctionalities.checkAnswer(answer.text.toString(), correctAnswer)) {
+             isCorrect.text = "Correct Answer"
+             gameFunctionalities.correctAnswer(player)
+         } else {
+             isCorrect.text = "Wrong Answer"
+             gameFunctionalities.incorrectAnswer(player)
+         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun updateScore(score: String) {
+        tvScore = findViewById(R.id.tv_score)
+        tvScore.text = "Score: $score"
     }
 }
