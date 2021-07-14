@@ -7,12 +7,10 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.*
-import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mybudgetapp.LobbyPlayers
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlin.random.Random
 
 
 class GameActivity : AppCompatActivity() {
@@ -24,7 +22,6 @@ class GameActivity : AppCompatActivity() {
     private val player = Player()
     private lateinit var tvScore: TextView
     private lateinit var tvLives: TextView
-    private lateinit var btAnswer: Button
 
     // Public variable
     lateinit var correctAnswer: String
@@ -74,7 +71,7 @@ class GameActivity : AppCompatActivity() {
 
         // Display top information
         val tvPlayer: TextView = findViewById(R.id.tv_player)
-        tvPlayer.text = player.name
+        tvPlayer.text = "Player: ${player.name}"
         tvScore = findViewById(R.id.tv_score)
         tvScore.text = "Score: ${player.score}"
         tvLives =  findViewById(R.id.tv_lives)
@@ -90,11 +87,16 @@ class GameActivity : AppCompatActivity() {
         val gameFunctionalities = GameFunctionalities(this)
         gameFunctionalities.runGame(player.difficulty)
 
-        btAnswer = findViewById(R.id.bt_answer)
-        btAnswer.setOnClickListener {
-            getResponse(gameFunctionalities)
+        // Answer TextView
+        val answer: EditText = findViewById(R.id.et_answer)
+        val isCorrect: TextView = findViewById(R.id.tv_isCorrect)
+        answer.setOnEditorActionListener { _, actionId, event ->
+            if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
+                //do what you want on the press of 'done'
+                getResponse(answer, isCorrect, gameFunctionalities)
+            }
+            true
         }
-
 
     }
 
@@ -112,7 +114,6 @@ class GameActivity : AppCompatActivity() {
     // Remove player from the database if they
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("awesomeFunGame","func called onDestroy")
         database.deletePlayerInLobby(db, player)
     }
 
@@ -127,16 +128,11 @@ class GameActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun getResponse(gameFunctionalities: GameFunctionalities) {
-        val answer: EditText = findViewById(R.id.et_answer)
-        val isCorrect: TextView = findViewById(R.id.tv_isCorrect)
-        answer.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
-            if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
-                //do what you want on the press of 'done'
-                btAnswer.performClick()
-            }
-            false
-        })
+    fun getResponse(
+        answer: EditText,
+        isCorrect: TextView,
+        gameFunctionalities: GameFunctionalities
+    ) {
          if (gameFunctionalities.checkAnswer(answer.text.toString(), correctAnswer)) {
              isCorrect.text = "Correct Answer"
              gameFunctionalities.correctAnswer(player)
@@ -144,6 +140,7 @@ class GameActivity : AppCompatActivity() {
              isCorrect.text = "Wrong Answer"
              gameFunctionalities.incorrectAnswer(player)
          }
+        answer.text.clear()
     }
 
     @SuppressLint("SetTextI18n")

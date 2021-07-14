@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -40,12 +41,19 @@ class MainActivity : AppCompatActivity() {
             setLobbyDisplay(selectedLobby)
         }
 
+        val etName: EditText = findViewById(R.id.et_name)
+        etName.setOnEditorActionListener { _, actionId, event ->
+            if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
+                //do what you want on the press of 'done'
+                startApp(etName, selectedLobby)
+            }
+            false
+        }
         val btStart: Button = findViewById(R.id.bt_start)
-        btStart.setOnClickListener { startApp(selectedLobby) }
+        btStart.setOnClickListener { startApp(etName, selectedLobby) }
     }
 
-    private fun startApp(selectedLobby: String) {
-        val etName: EditText = findViewById(R.id.et_name)
+    private fun startApp(etName: EditText, selectedLobby: String) {
         val intent = Intent(this, GameActivity::class.java)
         intent.putExtra("name", etName.text.toString())
         intent.putExtra("lobby", selectedLobby)

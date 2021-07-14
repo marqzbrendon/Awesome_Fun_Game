@@ -97,7 +97,6 @@ class GameFunctionalities(private val gameActivity: GameActivity) {
             val y: Int = (1..10).random()
             val z: Int = (1..20).random()
             val x: Int = y * z
-            Log.d("solution", "$z")
             return Triple(x, y, z)
         }
     }
