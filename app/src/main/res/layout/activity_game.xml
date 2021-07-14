@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GameActivity">
@@ -39,11 +40,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <ListView
         android:id="@+id/lv_players"
         android:layout_width="220dp"
         android:layout_height="149dp"
-        android:layout_marginTop="112dp"
+        android:layout_marginTop="96dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,34 +55,21 @@
         android:id="@+id/tv_num1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="116dp"
-        android:layout_marginLeft="116dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="124dp"
+        android:layout_marginLeft="124dp"
+        android:layout_marginTop="28dp"
         android:text="10"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lv_players" />
 
-    <EditText
-        android:id="@+id/et_answer"
-        android:layout_width="116dp"
-        android:layout_height="53dp"
-        android:layout_marginTop="56dp"
-        android:ems="10"
-        android:hint="Enter Answer"
-        android:inputType="number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_signal" />
-
     <TextView
         android:id="@+id/tv_num2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="116dp"
-        android:layout_marginRight="116dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="124dp"
+        android:layout_marginRight="124dp"
         android:text="10"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,29 +83,32 @@
         app:backgroundTint="#E91E63"
         app:layout_constraintBottom_toTopOf="@+id/lv_players"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_score" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_score"
+        app:layout_constraintVertical_bias="0.562" />
 
     <TextView
         android:id="@+id/tv_signal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="28dp"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/tv_num2"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toEndOf="@+id/tv_num1"
         app:layout_constraintTop_toBottomOf="@+id/lv_players" />
 
-    <TextView
-        android:id="@+id/tv_isCorrect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/et_answer"
+    <EditText
+        android:id="@+id/et_answer"
+        android:layout_width="116dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="Enter Answer"
+        android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_signal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

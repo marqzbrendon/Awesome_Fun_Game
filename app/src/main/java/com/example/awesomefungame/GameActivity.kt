@@ -2,13 +2,17 @@ package com.example.awesomefungame
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mybudgetapp.LobbyPlayers
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -74,7 +78,7 @@ class GameActivity : AppCompatActivity() {
         tvPlayer.text = "Player: ${player.name}"
         tvScore = findViewById(R.id.tv_score)
         tvScore.text = "Score: ${player.score}"
-        tvLives =  findViewById(R.id.tv_lives)
+        tvLives = findViewById(R.id.tv_lives)
         tvLives.text = "Lives: ${player.lives}"
 
         // Remove player
@@ -89,11 +93,10 @@ class GameActivity : AppCompatActivity() {
 
         // Answer TextView
         val answer: EditText = findViewById(R.id.et_answer)
-        val isCorrect: TextView = findViewById(R.id.tv_isCorrect)
         answer.setOnEditorActionListener { _, actionId, event ->
             if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
                 //do what you want on the press of 'done'
-                getResponse(answer, isCorrect, gameFunctionalities)
+                getResponse(answer, gameFunctionalities)
             }
             true
         }
@@ -127,19 +130,36 @@ class GameActivity : AppCompatActivity() {
         operator.text = op
     }
 
-    @SuppressLint("SetTextI18n")
-    fun getResponse(
-        answer: EditText,
-        isCorrect: TextView,
-        gameFunctionalities: GameFunctionalities
-    ) {
-         if (gameFunctionalities.checkAnswer(answer.text.toString(), correctAnswer)) {
-             isCorrect.text = "Correct Answer"
-             gameFunctionalities.correctAnswer(player)
-         } else {
-             isCorrect.text = "Wrong Answer"
-             gameFunctionalities.incorrectAnswer(player)
-         }
+    @SuppressLint("SetTextI18n", "CutPasteId")
+    fun getResponse(answer: EditText, gameFunctionalities: GameFunctionalities) {
+        val view: View = findViewById(R.id.view)
+        if (gameFunctionalities.checkAnswer(answer.text.toString(), correctAnswer)) {
+            val snackBarCorrect = Snackbar
+                .make(view, "Correct Answer", Snackbar.LENGTH_SHORT)
+            val mView: View = snackBarCorrect.view
+            val mTextView = mView.findViewById(R.id.snackbar_text) as TextView
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+                mTextView.textAlignment = View.TEXT_ALIGNMENT_CENTER;
+            else
+                mTextView.gravity = Gravity.CENTER_HORIZONTAL;
+            snackBarCorrect.view.setBackgroundColor(Color.parseColor("#008000"))
+            snackBarCorrect
+                .show()
+            gameFunctionalities.correctAnswer(player)
+        } else {
+            val snackBarIncorrect = Snackbar
+                .make(view, "Wrong Answer", Snackbar.LENGTH_SHORT)
+            val mView: View = snackBarIncorrect.view
+            val mTextView = mView.findViewById(R.id.snackbar_text) as TextView
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+                mTextView.textAlignment = View.TEXT_ALIGNMENT_CENTER;
+            else
+                mTextView.gravity = Gravity.CENTER_HORIZONTAL;
+            snackBarIncorrect.view.setBackgroundColor(Color.parseColor("#FF0000"))
+            snackBarIncorrect
+                .show()
+            gameFunctionalities.incorrectAnswer(player)
+        }
         answer.text.clear()
     }
 
