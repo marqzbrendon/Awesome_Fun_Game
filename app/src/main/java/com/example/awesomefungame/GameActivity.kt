@@ -21,11 +21,11 @@ class GameActivity : AppCompatActivity() {
 
     // Private variables
     private lateinit var lobby: String
-    private val db = Firebase.firestore
     private lateinit var database: AppDatabase
-    private val player = Player()
     private lateinit var tvScore: TextView
     private lateinit var tvLives: TextView
+    private val db = Firebase.firestore
+    private val player = Player()
 
     // Public variable
     lateinit var correctAnswer: String
